@@ -14,18 +14,7 @@ app.use(
 
 app.use(express.json());
 
-const alltodos = [
-  {
-    id: uuidv4(),
-    title: "First Todo",
-    description: "This is my first todo",
-  },
-  {
-    id: uuidv4(),
-    title: "Second Todo",
-    description: "This is my second todo",
-  },
-];
+const alltodos = [];
 
 // Home Route
 app.get("/", (req, res) => {
