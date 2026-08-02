@@ -8,7 +8,10 @@ const port = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: "https://new-todo-app-swart.vercel.app",
+    origin:[ "https://new-todo-app-swart.vercel.app",
+      'http://localhost:5173'
+    ],
+    methods: ["GET","POST","PUT","DELETE"],
      credentials: true,
   })
 );
@@ -128,6 +131,8 @@ app.delete("/deletetodo/:id", (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
 });
