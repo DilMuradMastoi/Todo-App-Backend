@@ -8,7 +8,7 @@ const port = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://new-todo-app-swart.vercel.app",
   })
 );
 
