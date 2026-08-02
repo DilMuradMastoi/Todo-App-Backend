@@ -1,90 +1,74 @@
 import express from "express";
-import { v4 as uuidv4 } from "uuid";
 import cors from "cors";
+import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 
-const port = process.env.PORT || 3000;
+app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://new-todo-app-swart.vercel.app",
-    
-    
-    methods: ["GET","POST","PUT","DELETE"],
-     credentials: true,
+    origin: [
+      "https://new-todo-app-swart.vercel.app",
+      "http://localhost:5173",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
-app.use(express.json());
+let alltodos = [];
 
-const alltodos = [];
-
-// Home Route
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend Running 🚀");
 });
 
-// Get All Todos
+// Get Todos
 app.get("/gettodos", (req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
     todos: alltodos,
-  });
-});
-
-// Get Single Todo
-app.get("/gettodo/:id", (req, res) => {
-  const { id } = req.params;
-
-  const todo = alltodos.find((todo) => todo.id === id);
-
-  if (!todo) {
-    return res.status(404).json({
-      success: false,
-      message: "Todo not found",
-    });
-  }
-
-  res.status(200).json({
-    success: true,
-    todo,
   });
 });
 
 // Add Todo
 app.post("/addtodo", (req, res) => {
-  const { title, description } = req.body;
+  const {
+    title,
+    description,
+    priority,
+    completed,
+    createdAt,
+  } = req.body;
 
   if (!title || !description) {
     return res.status(400).json({
       success: false,
-      message: "Title and Description are required",
+      message: "Title and Description required",
     });
   }
 
-  const newTodo = {
+  const todo = {
     id: uuidv4(),
     title,
     description,
+    priority: priority || "Medium",
+    completed: completed || false,
+    createdAt: createdAt || new Date().toLocaleString(),
   };
 
-  alltodos.push(newTodo);
+  alltodos.push(todo);
 
   res.status(201).json({
     success: true,
-    message: "Todo added successfully",
-    todo: newTodo,
+    todo,
     todos: alltodos,
   });
 });
 
-// Edit Todo
-app.put("/edittodo/:id", (req, res) => {
-  const { id } = req.params;
-  const { title, description } = req.body;
-
-  const todo = alltodos.find((todo) => todo.id === id);
+// Get One Todo
+app.get("/gettodo/:id", (req, res) => {
+  const todo = alltodos.find((t) => t.id === req.params.id);
 
   if (!todo) {
     return res.status(404).json({
@@ -93,26 +77,44 @@ app.put("/edittodo/:id", (req, res) => {
     });
   }
 
-if (title !== undefined) {
-  todo.title = title;
-}
-
-if (description !== undefined) {
-  todo.description = description;
-}
-
-  res.status(200).json({
+  res.json({
     success: true,
-    message: "Todo updated successfully",
+    todo,
+  });
+});
+
+// Edit Todo
+app.put("/edittodo/:id", (req, res) => {
+  const todo = alltodos.find((t) => t.id === req.params.id);
+
+  if (!todo) {
+    return res.status(404).json({
+      success: false,
+      message: "Todo not found",
+    });
+  }
+
+  const {
+    title,
+    description,
+    priority,
+    completed,
+  } = req.body;
+
+  if (title !== undefined) todo.title = title;
+  if (description !== undefined) todo.description = description;
+  if (priority !== undefined) todo.priority = priority;
+  if (completed !== undefined) todo.completed = completed;
+
+  res.json({
+    success: true,
     todo,
   });
 });
 
 // Delete Todo
 app.delete("/deletetodo/:id", (req, res) => {
-  const { id } = req.params;
-
-  const index = alltodos.findIndex((todo) => todo.id === id);
+  const index = alltodos.findIndex((t) => t.id === req.params.id);
 
   if (index === -1) {
     return res.status(404).json({
@@ -121,12 +123,11 @@ app.delete("/deletetodo/:id", (req, res) => {
     });
   }
 
-  const deletedTodo = alltodos.splice(index, 1);
+  const deleted = alltodos.splice(index, 1);
 
-  res.status(200).json({
+  res.json({
     success: true,
-    message: "Todo deleted successfully",
-    todo: deletedTodo[0],
+    todo: deleted[0],
     todos: alltodos,
   });
 });
