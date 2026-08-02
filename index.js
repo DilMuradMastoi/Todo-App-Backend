@@ -9,6 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(
   cors({
     origin: "https://new-todo-app-swart.vercel.app",
+     credentials: true,
   })
 );
 
