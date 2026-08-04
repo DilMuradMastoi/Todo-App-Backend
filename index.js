@@ -8,11 +8,12 @@ const app = express();
 // app.use(cors());
 const port = process.env.PORT || 3000;
 
+console.log("FRONTEND_URL =", process.env.FRONTEND_URL);
 app.use(
   cors({
     origin: [
-    process.env.FRONTEND_URL,
-      "http://localhost:5173",
+      "https://new-todo-app-brown.vercel.app",
+  "http://localhost:5173",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
