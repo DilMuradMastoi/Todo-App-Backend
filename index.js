@@ -3,9 +3,19 @@ import { v4 as uuidv4 } from "uuid";
 import cors from "cors";
 
 const app = express();
-app.use(cors());
-const port = 'https://new-todo-app-brown.vercel.app' || 3000;
+// app.use(cors());
+// const port = 'https://new-todo-app-brown.vercel.app' || 3000;
 
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://new-todo-app-brown.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 const alltodos = [
   {
     title: "First Todo",
