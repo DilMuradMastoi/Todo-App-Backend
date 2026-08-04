@@ -6,7 +6,6 @@ import cors from "cors";
 
 const app = express();
 // app.use(cors());
-const port = process.env.PORT || 3000;
 
 console.log("FRONTEND_URL =", process.env.FRONTEND_URL);
 app.use(
