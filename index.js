@@ -1,140 +1,86 @@
 import express from "express";
-import cors from "cors";
 import { v4 as uuidv4 } from "uuid";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
+const port = 'https://new-todo-app-brown.vercel.app' || 3000;
+
+const alltodos = [
+  {
+    title: "First Todo",
+    description:
+      "this is my first todo",
+    id: 1,
+  },
+];
 
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://new-todo-app-brown.vercel.app",
-    ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
-
-
-let alltodos = [];
-
 app.get("/", (req, res) => {
-  res.send("Backend Running 🚀");
+  res.send("Hello World!");
 });
 
-// Get Todos
-app.get("/gettodos", (req, res) => {
-  res.json({
-    success: true,
-    todos: alltodos,
-  });
-});
+// add todo
 
-// Add Todo
 app.post("/addtodo", (req, res) => {
-  const {
+  const { title, description } = req.body;
+  alltodos.push({
     title,
     description,
-    priority,
-    completed,
-    createdAt,
-  } = req.body;
-
-  if (!title || !description) {
-    return res.status(400).json({
-      success: false,
-      message: "Title and Description required",
-    });
-  }
-
-  const todo = {
-    id: uuidv4(),
-    title,
-    description,
-    priority: priority || "Medium",
-    completed: completed || false,
-    createdAt: createdAt || new Date().toLocaleString(),
-  };
-
-  alltodos.push(todo);
-
+    id: Date.now(),
+  });
   res.status(201).json({
-    success: true,
-    todo,
+    message: "Todo added successfully",
     todos: alltodos,
   });
 });
 
-// Get One Todo
+// get all todos
+
+app.get("/gettodos", (req, res) => {
+  res.json({ todos: alltodos });
+});
+
+// get single todo
+
 app.get("/gettodo/:id", (req, res) => {
-  const todo = alltodos.find((t) => t.id === req.params.id);
-
-  if (!todo) {
-    return res.status(404).json({
-      success: false,
-      message: "Todo not found",
-    });
+  const { id } = req.params;
+  const todoIndex = alltodos.findIndex((todo) => todo.id === +id);
+  console.log("api running");
+  if (todoIndex === -1) {
+    return res.status(404).json({ message: "Todo not found" });
   }
-
-  res.json({
-    success: true,
-    todo,
-  });
+  res.json({ todo: alltodos[todoIndex] });
 });
 
-// Edit Todo
-app.put("/edittodo/:id", (req, res) => {
-  const todo = alltodos.find((t) => t.id === req.params.id);
+// delete todo
 
-  if (!todo) {
-    return res.status(404).json({
-      success: false,
-      message: "Todo not found",
-    });
-  }
-
-  const {
-    title,
-    description,
-    priority,
-    completed,
-  } = req.body;
-
-  if (title !== undefined) todo.title = title;
-  if (description !== undefined) todo.description = description;
-  if (priority !== undefined) todo.priority = priority;
-  if (completed !== undefined) todo.completed = completed;
-
-  res.json({
-    success: true,
-    todo,
-  });
-});
-
-// Delete Todo
 app.delete("/deletetodo/:id", (req, res) => {
-  const index = alltodos.findIndex((t) => t.id === req.params.id);
-
-  if (index === -1) {
-    return res.status(404).json({
-      success: false,
-      message: "Todo not found",
-    });
+  const { id } = req.params;
+  const todoIndex = alltodos.findIndex((todo) => todo.id === +id);
+  if (todoIndex === -1) {
+    return res.status(404).json({ message: "Todo not found" });
   }
-
-  const deleted = alltodos.splice(index, 1);
-
-  res.json({
-    success: true,
-    todo: deleted[0],
-    todos: alltodos,
-  });
+  alltodos.splice(todoIndex, 1);
+  res.json({ message: "Todo deleted successfully" });
 });
 
-const PORT = process.env.PORT || 3000;
+// edit todo
 
-app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+app.put("/edittodo/:id", (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+  const todoIndex = alltodos.findIndex((todo) => todo.id === +id);
+
+  if (todoIndex === -1) {
+    return res.status(404).json({ message: "Todo not found" });
+  }
+
+  alltodos[todoIndex].title = title;
+  res.json({ message: "Todo updated successfully", todo: alltodos[todoIndex] });
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
