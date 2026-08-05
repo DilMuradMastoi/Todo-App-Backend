@@ -1,24 +1,11 @@
-import dotenv from "dotenv";
-dotenv.config();
 import express from "express";
 import { v4 as uuidv4 } from "uuid";
 import cors from "cors";
 
 const app = express();
-// app.use(cors());
+app.use(cors());
 const port = process.env.PORT || 3000;
 
-console.log("FRONTEND_URL =", process.env.FRONTEND_URL);
-app.use(
-  cors({
-    origin: [
-      "https://new-todo-app-brown.vercel.app",
-  "http://localhost:5173",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
 const alltodos = [
   {
     title: "First Todo",
